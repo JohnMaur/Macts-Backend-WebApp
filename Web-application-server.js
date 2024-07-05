@@ -302,7 +302,7 @@ app.post('/faculty', (req, res) => {
   });
 });
 
-// ---------------------Student information--------------------------------
+// ---------------------Student information---------------------------
 app.get('/studentinfo', (req, res) => {
 
   // Get a connection from the pool
@@ -327,7 +327,84 @@ app.get('/studentinfo', (req, res) => {
   });
 });
 
-// -------------------Student device information----------------------------
+// -----------------Adding attendance record---------------------
+// Fetch student info by TUPT ID
+app.get('/studentinfo/:tuptId', (req, res) => {
+  const { tuptId } = req.params;
+
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.error('Error connecting to database:', err);
+      return res.status(500).json({ error: 'Database connection error' });
+    }
+
+    connection.query('SELECT * FROM studentinfo WHERE studentInfo_tuptId = ?', [tuptId], (error, rows) => {
+      connection.release();
+
+      if (error) {
+        console.error('Error fetching student information:', error);
+        return res.status(500).json({ error: 'Error fetching student information' });
+      }
+
+      if (rows.length === 0) {
+        return res.status(404).json({ error: 'Student not found' });
+      }
+
+      res.json(rows[0]);
+    });
+  });
+});
+
+// Insert a new attendance record
+app.post('/attendance', (req, res) => {
+  const {
+    attendance_Id,
+    attendance_firstName,
+    attendance_middleName,
+    attendance_Lastname,
+    attendance_tupId,
+    attendance_course,
+    attendance_section,
+    attendance_email,
+    attendance_historyDate,
+    attendance_code,
+    user_id
+  } = req.body;
+
+  const attendanceData = {
+    attendance_Id,
+    attendance_firstName,
+    attendance_middleName,
+    attendance_Lastname,
+    attendance_tupId,
+    attendance_course,
+    attendance_section,
+    attendance_email,
+    attendance_historyDate,
+    attendance_code,
+    user_id
+  };
+
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.error('Error connecting to database:', err);
+      return res.status(500).json({ error: 'Database connection error' });
+    }
+
+    connection.query('INSERT INTO attendance_taphistory SET ?', attendanceData, (error, results) => {
+      connection.release();
+
+      if (error) {
+        console.error('Error inserting attendance record:', error);
+        return res.status(500).json({ error: 'Error inserting attendance record' });
+      }
+
+      res.status(201).json({ message: 'Attendance record added successfully', attendance_Id: results.insertId });
+    });
+  });
+});
+
+// -------------------Student device information-------------------
 app.get('/studentDevice', (req, res) => {
 
   // Get a connection from the pool
@@ -352,7 +429,7 @@ app.get('/studentDevice', (req, res) => {
   });
 });
 
-// ---------------------RFID Registration API--------------------------- 
+// ---------------------RFID Registration API--------------------------
 // API endpoint to fetch student information based on TUPT-ID
 app.get('/rfidRegistration/studentInfo', (req, res) => {
   const { tuptId } = req.query;
