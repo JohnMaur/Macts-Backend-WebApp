@@ -358,7 +358,6 @@ app.get('/studentinfo/:tuptId', (req, res) => {
 // Insert a new attendance record
 app.post('/Manual/attendance', (req, res) => {
   const {
-    attendance_Id,
     attendance_firstName,
     attendance_middleName,
     attendance_Lastname,
@@ -372,7 +371,6 @@ app.post('/Manual/attendance', (req, res) => {
   } = req.body;
 
   const attendanceData = {
-    attendance_Id,
     attendance_firstName,
     attendance_middleName,
     attendance_Lastname,
