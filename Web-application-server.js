@@ -230,7 +230,7 @@ app.post('/GuardSignUp', (req, res) => {
   });
 });
 
-// -------------------------Faculty Login API--------------------------------
+// -------------------------Faculty Login API--------------------------
 app.post('/faculty', (req, res) => {
   const { faculty_user, faculty_pass } = req.body;
 
@@ -327,7 +327,7 @@ app.get('/studentinfo', (req, res) => {
   });
 });
 
-// -----------------Adding attendance record---------------------
+// -----------------Manual Adding attendance record---------------------
 // Fetch student info by TUPT ID
 app.get('/studentinfo/:tuptId', (req, res) => {
   const { tuptId } = req.params;
@@ -356,7 +356,7 @@ app.get('/studentinfo/:tuptId', (req, res) => {
 });
 
 // Insert a new attendance record
-app.post('/attendance', (req, res) => {
+app.post('/Manual/attendance', (req, res) => {
   const {
     attendance_Id,
     attendance_firstName,
@@ -500,7 +500,7 @@ app.post('/rfidRegistration/:tuptId', (req, res) => {
   });
 });
 
-// --------------------Device Registration---------------------------------
+// --------------------Device Registration--------------------------
 // API endpoint to fetch student information based on TUPT-ID
 app.get('/deviceRegistration', (req, res) => {
   const { serialNumber } = req.query;
@@ -571,9 +571,9 @@ app.post('/deviceRegistration/:serialNumber', (req, res) => {
   });
 });
 
-// --------------------END Device Registration---------------------------------
+// --------------------END Device Registration-------------------------
 
-// ----------------------Adding Attendance---------------------------------
+// ----------------------Adding Attendance---------------------------
 app.post('/add-Attendance', (req, res) => {
   const { attendance_description, attendance_code, attendance_date } = req.body;
   pool.getConnection((err, connection) => {
@@ -599,7 +599,7 @@ app.post('/add-Attendance', (req, res) => {
   });
 });
 
-// ----------------------Fetching Attendance List----------------------------
+// ----------------------Fetching Attendance List----------------------
 app.get('/attendance', (req, res) => {
   // Perform a database query to fetch the attendance data
   pool.query('SELECT * FROM attendance', (error, results) => {
@@ -614,8 +614,8 @@ app.get('/attendance', (req, res) => {
   });
 });
 
-// -------------------Faculty Teacher Attendance-------------------------
-// ----------------------Adding Attendance---------------------------------
+// -------------------Faculty Teacher Attendance------------------------
+// ----------------------Adding Attendance----------------------------
 app.post('/Facultyadd-Attendance', (req, res) => {
   const { attendance_description, attendance_code, attendance_date, userId } = req.body;
   pool.getConnection((err, connection) => {
@@ -641,7 +641,7 @@ app.post('/Facultyadd-Attendance', (req, res) => {
   });
 });
 
-// ----------------------Fetching Attendance List----------------------------
+// ----------------------Fetching Attendance List----------------------
 app.get('/Facultyattendance/:userId', (req, res) => {
   const { userId } = req.params;
   // Perform a database query to fetch the attendance data for a specific user
@@ -657,9 +657,9 @@ app.get('/Facultyattendance/:userId', (req, res) => {
   });
 });
 
-// -------------------END Faculty Teacher Attendance-------------------------
+// -------------------END Faculty Teacher Attendance-------------------
 
-// ----------------------Fetching Attendance Report-------------------------
+// ----------------------Fetching Attendance Report--------------------
 app.post('/attendance/report/:code', (req, res) => {
   const { code } = req.params;
 
