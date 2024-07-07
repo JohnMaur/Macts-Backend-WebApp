@@ -801,8 +801,9 @@ app.get('/DeviceList', (req, res) => {
       return res.status(500).json({ error: 'Database connection error' });
     }
 
-    // Perform the database query to fetch data for devices with deviceRegistration as null
-    connection.query("SELECT * FROM student_device WHERE deviceRegistration = ''", (error, rows) => {
+    // Perform the database query to fetch data for devices where deviceRegistration is null or empty string
+    const sqlQuery = "SELECT * FROM student_device WHERE deviceRegistration IS NULL OR deviceRegistration = ''";
+    connection.query(sqlQuery, (error, rows) => {
       // Release the connection
       connection.release();
 
