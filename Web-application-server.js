@@ -793,7 +793,7 @@ app.get('/Gatepass-Report', (req, res) => {
 // ---------------------ND of REPORT API------------------------------
 
 // --------------------Fetch Device List-----------------------------
-app.post('/DeviceList', (req, res) => {
+app.get('/DeviceList', (req, res) => {
   // Get a connection from the pool
   pool.getConnection((err, connection) => {
     if (err) {
@@ -816,7 +816,6 @@ app.post('/DeviceList', (req, res) => {
     });
   });
 });
-
 
 // ------------------------PDF Download server------------------------
 
