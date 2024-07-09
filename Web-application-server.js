@@ -869,7 +869,12 @@ app.get('/Attendance-Report/pdf', (req, res) => {
     return res.status(400).json({ error: 'Date and attendance code are required' });
   }
 
-  const formattedDate = moment(date, 'YYYY-MM-DD').format('YYYY-MM-DD');
+  const formattedDate = moment(date, 'MM/DD/YYYY').format('YYYY-MM-DD'); // Use the correct format for the date
+
+  // Check if the formatted date is valid
+  if (!moment(formattedDate, 'YYYY-MM-DD', true).isValid()) {
+    return res.status(400).json({ error: 'Invalid date format' });
+  }
 
   // Get a connection from the pool
   pool.getConnection((err, connection) => {
@@ -884,7 +889,7 @@ app.get('/Attendance-Report/pdf', (req, res) => {
       FROM attendance_taphistory ath
       JOIN attendance a ON ath.attendance_code = a.attendance_code
       WHERE ath.attendance_code = ?
-      AND DATE_FORMAT(STR_TO_DATE(ath.attendance_historyDate, '%c/%e/%Y, %r'), '%Y-%m-%d') = ?
+      AND DATE_FORMAT(STR_TO_DATE(ath.attendance_historyDate, '%m/%d/%Y, %r'), '%Y-%m-%d') = ?
     `;
     connection.query(query, [attendance_code, formattedDate], (error, rows) => {
       // Release the connection
@@ -900,6 +905,7 @@ app.get('/Attendance-Report/pdf', (req, res) => {
     });
   });
 });
+
 
 // Library Report PDF API
 app.get('/Library-Report/pdf', (req, res) => {
