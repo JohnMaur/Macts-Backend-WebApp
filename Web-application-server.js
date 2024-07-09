@@ -880,12 +880,13 @@ app.get('/Attendance-Report/pdf', (req, res) => {
 
     // Perform the database query to fetch data based on date and attendance_code
     const query = `
-      SELECT ath.*, a.attendance_description 
-      FROM attendance_taphistory ath
-      JOIN attendance a ON ath.attendance_code = a.attendance_code
-      WHERE ath.attendance_code = ?
-      AND DATE_FORMAT(STR_TO_DATE(ath.attendance_historyDate, '%c/%e/%Y, %r'), '%Y-%m-%d') = ?
+    SELECT ath.*, a.attendance_description 
+    FROM attendance_taphistory ath
+    JOIN attendance a ON ath.attendance_code = a.attendance_code
+    WHERE ath.attendance_code = ?
+    AND DATE(STR_TO_DATE(ath.attendance_historyDate, '%c/%e/%Y, %r')) = ?
     `;
+
     connection.query(query, [attendance_code, formattedDate], (error, rows) => {
       // Release the connection
       connection.release();
