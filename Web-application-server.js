@@ -820,18 +820,56 @@ app.get('/DeviceList', (req, res) => {
 
 // ------------------------PDF Download server------------------------
 
+// app.get('/Attendance-Report/pdf', (req, res) => {
+//   const { date, attendance_code } = req.query; // Get the date and attendance_code from query parameters
+//   if (!date || !attendance_code) {
+//     return res.status(400).json({ error: 'Date and attendance code are required' });
+//   }
+
+//   const formattedDate = date;
+
+//   // Check if the formatted date is valid
+//   if (!moment(formattedDate, 'YYYY-MM-DD', true).isValid()) {
+//     return res.status(400).json({ error: 'Invalid date format' });
+//   }
+
+//   // Get a connection from the pool
+//   pool.getConnection((err, connection) => {
+//     if (err) {
+//       console.error('Error connecting to database:', err);
+//       return res.status(500).json({ error: 'Database connection error' });
+//     }
+
+//     // Perform the database query to fetch data based on date and attendance_code
+//     const query = `
+//       SELECT ath.*, a.attendance_description 
+//       FROM attendance_taphistory ath
+//       JOIN attendance a ON ath.attendance_code = a.attendance_code
+//       WHERE ath.attendance_code = ?
+//       AND DATE_FORMAT(STR_TO_DATE(ath.attendance_historyDate, '%c/%e/%Y, %r'), '%Y-%m-%d') = ?
+//     `;
+//     connection.query(query, [attendance_code, formattedDate], (error, rows) => {
+//       // Release the connection
+//       connection.release();
+
+//       if (error) {
+//         console.error('Error fetching tap history student information:', error);
+//         return res.status(500).json({ error: 'Error fetching tap history student information' });
+//       }
+
+//       // Send the fetched data
+//       res.json(rows);
+//     });
+//   });
+// });
+
 app.get('/Attendance-Report/pdf', (req, res) => {
   const { date, attendance_code } = req.query; // Get the date and attendance_code from query parameters
   if (!date || !attendance_code) {
     return res.status(400).json({ error: 'Date and attendance code are required' });
   }
 
-  const formattedDate = date;
-
-  // Check if the formatted date is valid
-  if (!moment(formattedDate, 'YYYY-MM-DD', true).isValid()) {
-    return res.status(400).json({ error: 'Invalid date format' });
-  }
+  const formattedDate = moment(date, 'YYYY-MM-DD').format('YYYY-MM-DD');
 
   // Get a connection from the pool
   pool.getConnection((err, connection) => {
