@@ -230,7 +230,7 @@ app.post('/GuardSignUp', (req, res) => {
   });
 });
 
-// -------------------------Faculty Login API--------------------------
+// -------------------------Faculty Login API-----------------------
 app.post('/faculty', (req, res) => {
   const { faculty_user, faculty_pass } = req.body;
 
@@ -327,7 +327,7 @@ app.get('/studentinfo', (req, res) => {
   });
 });
 
-// -----------------Manual Adding attendance record---------------------
+// -----------------Manual Adding attendance record------------------
 // Fetch student info by TUPT ID
 app.get('/studentinfo/:tuptId', (req, res) => {
   const { tuptId } = req.params;
@@ -399,6 +399,147 @@ app.post('/Manual/attendance', (req, res) => {
 
       res.status(201).json({ message: 'Attendance record added successfully', attendance_Id: results.insertId });
     });
+  });
+});
+
+// -------------Faculty Attendance Manual adding code----------------
+// Get student info by TUPT ID
+app.get('/getAttendanceCode/studentinfo/:tuptId', (req, res) => {
+  const { tuptId } = req.params;
+  const query = 'SELECT * FROM studentinfo WHERE studentInfo_tuptId = ?';
+
+  pool.query(query, [tuptId], (err, results) => {
+    if (err) {
+      console.error('Error fetching student info:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+    res.json(results[0]);
+  });
+});
+
+// Update attendance code for a student by TUPT ID
+app.post('/attendanceCode/studentinfo/:tuptId', (req, res) => {
+  const { tuptId } = req.params;
+  const { attendance_code } = req.body;
+  const query = 'UPDATE studentinfo SET attendance_code = ? WHERE studentInfo_tuptId = ?';
+
+  pool.query(query, [attendance_code, tuptId], (err, results) => {
+    if (err) {
+      console.error('Error updating attendance code:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    if (results.affectedRows === 0) {
+      return res.status(404).json({ error: 'Student not found' });
+    }
+    res.json({ message: 'Attendance code updated successfully' });
+  });
+});
+
+// ----------Manual large adding attendance code------------------
+// Get students by section
+app.get('/getStudentsBySection/:section', (req, res) => {
+  const { section } = req.params;
+  const query = 'SELECT studentInfo_last_name, studentInfo_first_name, studentInfo_middle_name, studentInfo_course, studentInfo_section FROM studentinfo WHERE studentInfo_section = ?';
+
+  pool.query(query, [section], (err, results) => {
+    if (err) {
+      console.error('Error fetching students:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(results);
+  });
+});
+
+// Update attendance code for students by section
+app.post('/updateAttendanceCodeBySection', (req, res) => {
+  const { section, attendance_code } = req.body;
+  const query = 'UPDATE studentinfo SET attendance_code = ? WHERE studentInfo_section = ?';
+
+  pool.query(query, [attendance_code, section], (err, results) => {
+    if (err) {
+      console.error('Error updating attendance codes:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json({ message: 'Attendance codes updated successfully' });
+  });
+});
+
+// ---------------Insertion Attendance Record-------------------
+app.post('/attendance_taphistory', (req, res) => {
+  const {
+    attendance_firstName,
+    attendance_middleName,
+    attendance_Lastname,
+    attendance_tupId,
+    attendance_course,
+    attendance_section,
+    attendance_email,
+    attendance_historyDate,
+    attendance_code,
+    user_id
+  } = req.body;
+
+  const query = `
+    INSERT INTO attendance_taphistory (
+      attendance_firstName,
+      attendance_middleName,
+      attendance_Lastname,
+      attendance_tupId,
+      attendance_course,
+      attendance_section,
+      attendance_email,
+      attendance_historyDate,
+      attendance_code,
+      user_id
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  pool.getConnection((err, connection) => {
+    if (err) {
+      console.error('Error connecting to database:', err);
+      return res.status(500).json({ error: 'Database connection error' });
+    }
+
+    connection.query(query, [
+      attendance_firstName,
+      attendance_middleName,
+      attendance_Lastname,
+      attendance_tupId,
+      attendance_course,
+      attendance_section,
+      attendance_email,
+      attendance_historyDate,
+      attendance_code,
+      user_id
+    ], (error, results) => {
+      connection.release();
+
+      if (error) {
+        console.error('Error inserting tap history:', error);
+        return res.status(500).json({ error: 'Error inserting tap history' });
+      }
+
+      res.status(200).json({ message: 'Tap history recorded successfully' });
+    });
+  });
+});
+
+
+// ----------List of students who have joined in attendance--------
+// Express route to fetch students with a specific attendance code
+app.get('/studentsByAttendanceCode/:attendanceCode', (req, res) => {
+  const { attendanceCode } = req.params;
+  const query = 'SELECT * FROM studentinfo WHERE attendance_code = ?';
+
+  pool.query(query, [attendanceCode], (err, results) => {
+    if (err) {
+      console.error('Error fetching students by attendance code:', err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(results);
   });
 });
 
